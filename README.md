@@ -12,6 +12,23 @@ machine; nothing is uploaded.
 
 ---
 
+## Get the code
+
+Project page: **https://github.com/hjpark0820/plot-digitizer**
+
+**Option A — Download ZIP (no git needed):**
+Open the page above, click the green **Code** button, then **Download ZIP**, and
+unzip it. You get a `plot-digitizer` folder with everything inside.
+
+**Option B — git clone (easy updates later):**
+```bash
+git clone https://github.com/hjpark0820/plot-digitizer.git
+# later, to get the newest version:
+cd plot-digitizer && git pull
+```
+
+---
+
 ## Required files
 
 Only the files below are needed to run the app. Everything else (training,
