@@ -970,9 +970,9 @@ def _load_val_to_ram(tensors_path: str, labels_path: str,
 #  MODEL
 # ══════════════════════════════════════════════════════════════════════════════
 
-def build_model(n_classes: int = N_CLASSES, pretrained: bool = True) -> nn.Module:
+def build_model(n_classes: int = N_CLASSES) -> nn.Module:
     model = timm.create_model(
-        'vit_tiny_patch16_224', pretrained=pretrained,
+        'vit_tiny_patch16_224', pretrained=True,
         num_classes=n_classes, img_size=VIT_INPUT
     )
     # freeze all blocks except the last 4
@@ -1512,38 +1512,10 @@ def train(n_plots: int = N_PLOTS):
 #  DETECTION
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _load_model(model_path: str | Path | None = None) -> tuple[nn.Module, torch.device]:
-    """
-    Load the chart marker ViT model.
-
-    Priority:
-      1. model_path argument (if given and file exists)
-      2. Default MODEL_SAVE_PATH  (chartocode2/models/chart_marker_net_v3.pth)
-      3. timm pretrained ImageNet weights (fallback — no fine-tuning)
-    """
+def _load_model(model_path: str | Path) -> tuple[nn.Module, torch.device]:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    # Resolve which weight file to use
-    candidates = []
-    if model_path is not None:
-        candidates.append(Path(model_path))
-    candidates.append(MODEL_SAVE_PATH)   # default: ../models/chart_marker_net_v3.pth
-
-    for p in candidates:
-        if Path(p).exists():
-            print(f"[model] Loading fine-tuned weights: {p}")
-            m = build_model(pretrained=False)   # don't re-download ImageNet weights
-            m.load_state_dict(
-                torch.load(str(p), map_location=device, weights_only=True)
-            )
-            m.eval().to(device)
-            return m, device
-
-    # Fallback: timm pretrained (ImageNet) — no chart-specific fine-tuning
-    print("[model] WARNING: chart_marker_net_v3.pth not found.")
-    print("[model] Falling back to timm pretrained ImageNet weights (vit_tiny_patch16_224).")
-    print("[model] Detection accuracy will be lower without fine-tuned weights.")
-    m = build_model(pretrained=True)
+    m = build_model()
+    m.load_state_dict(torch.load(str(model_path), map_location=device, weights_only=True))
     m.eval().to(device)
     return m, device
 
